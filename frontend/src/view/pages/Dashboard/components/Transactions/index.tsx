@@ -2,10 +2,12 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { MONTHS } from "../../../../../app/config/constants";
 import { cn } from "../../../../../app/utils/cn";
 import { formatCurrency } from "../../../../../app/utils/formatCurrency";
+import { formatDate } from "../../../../../app/utils/formatDate";
 import emptyStateImage from '../../../../../assets/empty-state.svg';
 import { Spinner } from "../../../../components/Spinner";
 import { FilterIcon } from "../../../../components/icons/FilterIcon";
 import { CategoryIcon } from "../../../../components/icons/categories/CategoryIcon";
+import { EditTransactionModal } from "../../modals/EditTransactionModal";
 import { FiltersModal } from "./FiltersModal";
 import { SliderNavigation } from "./SliderNavigation";
 import { SliderOption } from "./SliderOption";
@@ -20,7 +22,14 @@ export function Transactions() {
     transactions,
     isFilterModalOpen,
     handleOpenFilterModal,
-    handleCloseFilterModal
+    handleCloseFilterModal,
+    handleChangeFilters,
+    filters,
+    handleApplyFilters,
+    isEditModalOpen,
+    transactionBeingEdited,
+    handleOpenEditModal,
+    handleCloseEditModal
   } = useTransactionsController();
   const hasTransactions = transactions.length > 0;
 
@@ -37,11 +46,15 @@ export function Transactions() {
           <FiltersModal
             open={isFilterModalOpen}
             onClose={handleCloseFilterModal}
+            onApplyFilters={handleApplyFilters}
           />
 
           <header>
             <div className="flex justify-between items-center">
-              <TransactionTypeDropdown />
+              <TransactionTypeDropdown
+                onSelect={handleChangeFilters('type')}
+                selectedType={filters.type}
+              />
 
               <button onClick={handleOpenFilterModal}>
                 <FilterIcon />
@@ -52,6 +65,10 @@ export function Transactions() {
               <Swiper
                 slidesPerView={3}
                 centeredSlides
+                initialSlide={filters.month}
+                onSlideChange={swiper => {
+                  handleChangeFilters('month')(swiper.realIndex);
+                }}
               >
                 <SliderNavigation />
 
@@ -88,45 +105,49 @@ export function Transactions() {
 
             {(hasTransactions && !isLoading) && (
               <>
-                <div className="bg-white p-4 rounded-2xl flex items-center justify-between gap-4">
-                  <div className="flex-1 flex items-center gap-3">
-                    <CategoryIcon type="expense" />
+                {transactionBeingEdited && (
+                  <EditTransactionModal
+                    open={isEditModalOpen}
+                    onClose={handleCloseEditModal}
+                    transaction={transactionBeingEdited}
+                  />
+                )}
 
-                    <div>
-                      <strong className="font-bold tracking-[-0.5px] block">Almoço</strong>
-                      <span className="text-sm text-gray-600">04/06/2023</span>
-                    </div>
-                  </div>
-
-                  <span
-                    className={cn(
-                      'text-red-800 tracking-[-0.5px] font-medium',
-                      !areValuesVisible && 'blur-sm'
-                    )}
+                {transactions.map(transaction => (
+                  <div
+                    key={transaction.id}
+                    className="bg-white p-4 rounded-2xl flex items-center justify-between gap-4"
+                    role="button"
+                    onClick={() => handleOpenEditModal(transaction)}
                   >
-                    - {formatCurrency(1300)}
-                  </span>
-                </div>
+                    <div className="flex-1 flex items-center gap-3">
+                      <CategoryIcon
+                        type={transaction.type === 'EXPENSE' ? 'expense' : 'income'}
+                        category={transaction.category?.icon}
+                      />
 
-                <div className="bg-white p-4 rounded-2xl flex items-center justify-between gap-4">
-                  <div className="flex-1 flex items-center gap-3">
-                    <CategoryIcon type="income" />
-
-                    <div>
-                      <strong className="font-bold tracking-[-0.5px] block">Almoço</strong>
-                      <span className="text-sm text-gray-600">04/06/2023</span>
+                      <div>
+                        <strong className="font-bold tracking-[-0.5px] block">
+                          {transaction.name}
+                        </strong>
+                        <span className="text-sm text-gray-600">
+                          {formatDate(new Date(transaction.date))}
+                        </span>
+                      </div>
                     </div>
-                  </div>
 
-                  <span
-                    className={cn(
-                      'text-green-800 tracking-[-0.5px] font-medium',
-                      !areValuesVisible && 'blur-sm'
-                    )}
-                  >
-                    + {formatCurrency(1300)}
-                  </span>
-                </div>
+                    <span
+                      className={cn(
+                        'tracking-[-0.5px] font-medium',
+                        transaction.type === 'EXPENSE' ? 'text-red-800' : 'text-green-800',
+                        !areValuesVisible && 'blur-sm'
+                      )}
+                    >
+                      {transaction.type === 'EXPENSE' ? '- ' : '+ '}
+                      {formatCurrency(transaction.value)}
+                    </span>
+                  </div>
+                ))}
               </>
             )}
           </div>
