@@ -9,9 +9,7 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe());
   app.enableCors({
-    credentials: true,
-    methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
-    origin: 'https://fincheck-lac.vercel.app',
+    origin: '*',
   });
   await app.listen(3000);
 }
