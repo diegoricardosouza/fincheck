@@ -1,18 +1,15 @@
 {
     "version": 2,
-    "github": {
-        "enabled": false
-    },
     "builds": [
         {
-            "src": "/dist/main.ts",
+            "src": "src/main.ts",
             "use": "@vercel/node"
         }
     ],
     "routes": [
         {
             "src": "/(.*)",
-            "dest": "/dist/main.ts",
+            "dest": "src/main.ts",
             "methods": [
                 "GET",
                 "POST",
