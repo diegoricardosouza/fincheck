@@ -11,7 +11,7 @@ async function bootstrap() {
   app.enableCors({
     credentials: true,
     methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
-    origin: 'https://api-fincheck.vercel.app/',
+    origin: 'https://fincheck-lac.vercel.app',
   });
   await app.listen(3000);
 }
