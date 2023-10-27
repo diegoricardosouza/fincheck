@@ -53,6 +53,9 @@ export class TransactionsService {
           lt: new Date(Date.UTC(filters.year, filters.month + 1)),
         },
       },
+      orderBy: {
+        date: 'desc',
+      },
       include: {
         category: {
           select: {
