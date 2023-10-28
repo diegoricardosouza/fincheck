@@ -61,7 +61,12 @@ export function useNewTransactionModalController() {
           : 'Receita cadastrada com sucesso!'
       );
       closeNewTransactionModal();
-      reset();
+      reset({
+        name: "",
+        value: "0",
+        categoryId: "",
+        bankAccountId: ""
+      });
     } catch {
       toast.error(
         newTransactionType === 'EXPENSE'
