@@ -8,8 +8,17 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.useGlobalPipes(new ValidationPipe());
+  // app.enableCors({
+  //   origin: '*',
+  // });
+  // app.enableCors({
+  //   origin: ['https://fincheck.diegoricardoweb.dev'],
+  //   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  //   credentials: true,
+  // });
   app.enableCors({
-    origin: '*',
+    origin: ['https://fincheck.diegoricardoweb.dev'],
+    credentials: true,
   });
   await app.listen(3000);
 }
